@@ -1,7 +1,7 @@
 module Zencoder::CLI::Command
-  class Outputs < Base
+  class Output < Base
 
-    provides "outputs", { "outputs:progress" => "Show output progress" }
+    provides "output", "output:progress" => "Show output progress"
 
     class << self
 
@@ -19,5 +19,6 @@ module Zencoder::CLI::Command
       end
 
     end
+
   end
 end

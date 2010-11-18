@@ -4,9 +4,9 @@ require 'yaml'
 module Zencoder::CLI::Command
   class Setup < Base
 
-    provides "setup", { "setup"        => "Caches authentication credentials",
-                        "setup:show"   => "Shows your API keys",
-                        "setup:delete" => "Removes cached credentials and plugins" }
+    provides "setup", "setup"        => "Caches authentication credentials",
+                      "setup:show"   => "Shows your API keys",
+                      "setup:delete" => "Removes cached credentials and plugins"
 
     class << self
 

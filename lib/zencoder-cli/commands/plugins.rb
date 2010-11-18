@@ -1,13 +1,13 @@
 module Zencoder::CLI::Command
   class Plugins < Base
 
-    provides "plugins", { "plugins:list" => "Lists installed plugins",
-                          "plugins:install" => "Install a plugin via URL",
-                          "plugins:uninstall" => "Uninstall a plugin" }
+    provides "plugins", "plugins"           => "Lists installed plugins",
+                        "plugins:install"   => "Install a plugin via URL",
+                        "plugins:uninstall" => "Uninstall a plugin"
 
     class << self
 
-      def list(args, global_options, command_options)
+      def run(args, global_options, command_options)
         if Zencoder::CLI::Plugin.list.any?
           puts "The following plugins are installed:"
           Zencoder::CLI::Plugin.list.each do |plugin|

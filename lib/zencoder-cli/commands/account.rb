@@ -1,13 +1,12 @@
 module Zencoder::CLI::Command
   class Account < Base
 
-    provides "account", { "account:show" => "Show account information",
-                          "account:integration" => "Put your account in integration mode",
-                          "account:live" => "Take your account out of integration mode" }
-
+    provides "account", "account"             => "Show account information",
+                        "account:integration" => "Put your account in integration mode",
+                        "account:live"        => "Take your account out of integration mode"
     class << self
 
-      def show(args, global_options, command_options)
+      def run(args, global_options, command_options)
         account = Zencoder::Account.details(:base_url => Zencoder.base_url(global_options[:environment])).body
         rows = []
         rows << ["Minutes Used", account["minutes_used"]]

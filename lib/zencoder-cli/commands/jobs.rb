@@ -1,20 +1,15 @@
 module Zencoder::CLI::Command
+
   class Jobs < Base
-
-    provides "jobs", { "jobs:list"     => { :description => "Lists the most recent jobs",
-                                            :options => proc{|t|
-                                              t.opt :number, "Number of jobs returned per page. Default 10.", :type => Integer
-                                              t.opt :page,   "Jobs page number. Default 1.", :type => Integer
-                                              t.opt :long,   "Will not truncate filenames.", :default => false
-                                            }},
-                       "jobs:show"     => "Show job details by ID",
-                       "jobs:resubmit" => "Resubmit a job by ID",
-                       "jobs:cancel"   => "Cancels a job by ID",
-                       "jobs:delete"   => "Deletes a job by ID" }
-
+    provides "jobs", "jobs" => { :description => "Lists the most recent jobs",
+                                 :options => proc{|t|
+                                   t.opt :number, "Number of jobs returned per page. Default 10.", :type => Integer
+                                   t.opt :page,   "Jobs page number. Default 1.", :type => Integer
+                                   t.opt :long,   "Will not truncate filenames.", :default => false
+                                 }}
     class << self
 
-      def list(args, global_options, command_options)
+      def run(args, global_options, command_options)
         jobs = Zencoder::Job.list(:base_url => Zencoder.base_url(global_options[:environment]), :per_page => command_options[:number] || 10, :page => command_options[:page] || 1).process_for_cli.body
         if jobs.any?
           jobs_table = table do |t|
@@ -39,8 +34,21 @@ module Zencoder::CLI::Command
         end
       end
 
-      def show(args, global_options, command_options)
-        job = Zencoder::Job.details(args.shift, :base_url => Zencoder.base_url(global_options[:environment])).process_for_cli.body["job"]
+    end
+  end
+
+
+  class Job < Base
+    provides "job",  "job"          => { :description => "Show job details by ID", :help => "" },
+                     "job:open"     => "Opens the job in the dashboard",
+                     "job:resubmit" => "Resubmit a job by ID",
+                     "job:cancel"   => "Cancels a job by ID",
+                     "job:delete"   => "Deletes a job by ID"
+    class << self
+
+      def run(args, global_options, command_options)
+        job_id = extract_job_id(args)
+        job = Zencoder::Job.details(job_id, :base_url => Zencoder.base_url(global_options[:environment])).process_for_cli.body["job"]
         rows = []
         rows << ["ID", job["id"]]
         rows << ["Created", format_date(job["created_at"])]
@@ -110,24 +118,41 @@ module Zencoder::CLI::Command
         end
       end
 
+      def open(args, global_options, command_options)
+        job_id = extract_job_id(args)
+        `open https://app.zencoder.com/jobs/#{job_id}`
+      end
+
       def resubmit(args, global_options, command_options)
-        job_id = args.shift
+        job_id = extract_job_id(args)
         response = Zencoder::Job.resubmit(job_id, :base_url => Zencoder.base_url(global_options[:environment])).process_for_cli
         puts "Job ##{job_id} resubmitted."
       end
 
       def cancel(args, global_options, command_options)
-        job_id = args.shift
+        job_id = extract_job_id(args)
         response = Zencoder::Job.cancel(job_id, :base_url => Zencoder.base_url(global_options[:environment])).process_for_cli
         puts "Job ##{job_id} cancelled."
       end
 
       def delete(args, global_options, command_options)
-        job_id = args.shift
+        job_id = extract_job_id(args)
         response = Zencoder::Job.delete(job_id, :base_url => Zencoder.base_url(global_options[:environment])).process_for_cli
         puts "Job ##{job_id} deleted."
       end
 
+
+    private
+
+      def extract_job_id(args)
+        job_id = args.shift
+        if !job_id.to_s.strip[/^\d+$/]
+          puts "You must specify the job to show. Try `zencoder jobs:show --help` for more information."
+          exit 1
+        end
+        job_id
+      end
     end
+
   end
 end
