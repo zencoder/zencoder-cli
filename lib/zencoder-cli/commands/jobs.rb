@@ -39,11 +39,16 @@ module Zencoder::CLI::Command
 
 
   class Job < Base
-    provides "job",  "job"          => { :description => "Show job details by ID", :help => "" },
-                     "job:open"     => "Opens the job in the dashboard",
-                     "job:resubmit" => "Resubmit a job by ID",
-                     "job:cancel"   => "Cancels a job by ID",
-                     "job:delete"   => "Deletes a job by ID"
+    provides "job",  "job"          => { :description => "Show job details by ID",
+                                         :arguments => ["job_id"] },
+                     "job:open"     => { :description => "Opens the job in the dashboard",
+                                         :arguments => ["job_id"] },
+                     "job:resubmit" => { :description => "Resubmit a job by ID",
+                                         :arguments => ["job_id"] },
+                     "job:cancel"   => { :description => "Cancels a job by ID",
+                                         :arguments => ["job_id"] },
+                     "job:delete"   => { :description => "Deletes a job by ID",
+                                         :arguments => ["job_id"] }
     class << self
 
       def run(args, global_options, command_options)
@@ -146,8 +151,9 @@ module Zencoder::CLI::Command
 
       def extract_job_id(args)
         job_id = args.shift
+        method_name = caller.first[/`(.*)'$/, 1]
         if !job_id.to_s.strip[/^\d+$/]
-          puts "You must specify the job to show. Try `zencoder jobs:show --help` for more information."
+          puts "You must specify the job to show. Try `zencoder job#{":"+method_name unless method_name == "run"} --help` for more information."
           exit 1
         end
         job_id

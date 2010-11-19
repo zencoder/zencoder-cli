@@ -1,11 +1,13 @@
 Zencoder::CLI::Plugin.load!
 
+head = "#{"-" * (14 + Zencoder::CLI::GEM_VERSION.length)}
+Zencoder CLI v#{Zencoder::CLI::GEM_VERSION}
+#{"-" * (14 + Zencoder::CLI::GEM_VERSION.length)}"
+
 global_options = Trollop::options do
   version "Zencoder #{Zencoder::CLI::GEM_VERSION}"
   banner <<-EOS
-#{"-" * (14 + Zencoder::CLI::GEM_VERSION.length)}
-Zencoder CLI v#{Zencoder::CLI::GEM_VERSION}
-#{"-" * (14 + Zencoder::CLI::GEM_VERSION.length)}
+#{head}
 
 == Usage
 
@@ -39,9 +41,23 @@ args = ARGV
 flat_commands = Zencoder::CLI::Command.commands.values.inject({}){|memo,group| memo.merge!(group) }
 command_options = Trollop::options do
   banner <<-EOS
+#{head}
+#{
+  if flat_commands[command][:help]
+    "\n"+flat_commands[command][:help]+"\n"
+  end
+}
 == Usage
 
-zencoder [global-options] #{command} [options]
+zencoder [global-options] #{command}#{" [args]" if flat_commands[command][:arguments]} [options]
+#{
+  if flat_commands[command][:arguments]
+    "\n== Arguments\n\n"+
+    (1..flat_commands[command][:arguments].size).to_a.map{|i|
+      "#{i}: #{flat_commands[command][:arguments][i-1].to_s}"
+    }.join("\n")
+  end
+}
 
 == Command Options
 EOS
