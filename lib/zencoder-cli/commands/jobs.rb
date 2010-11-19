@@ -6,11 +6,15 @@ module Zencoder::CLI::Command
                                    t.opt :number, "Number of jobs returned per page. Default 10.", :type => Integer
                                    t.opt :page,   "Jobs page number. Default 1.", :type => Integer
                                    t.opt :long,   "Will not truncate filenames.", :default => false
+                                   t.opt :state,  "Filter the job list by job state", :type => String
                                  }}
     class << self
 
       def run(args, global_options, command_options)
-        jobs = Zencoder::Job.list(:base_url => Zencoder.base_url(global_options[:environment]), :per_page => command_options[:number] || 10, :page => command_options[:page] || 1).process_for_cli.body
+        jobs = Zencoder::Job.list(:base_url => Zencoder.base_url(global_options[:environment]),
+                                  :per_page => command_options[:number] || 10,
+                                  :page => command_options[:page] || 1,
+                                  :state => command_options[:state].try(:downcase)).process_for_cli.body
         if jobs.any?
           jobs_table = table do |t|
             t.headings = ["ID", "Created", "Filename", "Duration", "Size", "Test", "State"]
