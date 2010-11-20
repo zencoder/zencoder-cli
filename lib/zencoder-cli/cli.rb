@@ -73,7 +73,6 @@ rescue Timeout::Error
   puts "The request timed out. Try again later or contact support."
   exit 1
 rescue Interrupt
-  # puts
   puts "\rRequest cancelled."
   exit
 end
