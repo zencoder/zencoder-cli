@@ -11,15 +11,15 @@ module Zencoder::CLI
 
       def run(command, args, global_options={}, command_options={})
         Zencoder::CLI::Auth.require_authentication(global_options[:environment]) unless command[/^setup/]
-        pieces = command.split(":")
-        if pieces.size == 1
+        names = command.split(":")
+        klass_name = "Zencoder::CLI::Command::#{names.map(&:camelize).join("::")}"
+        if klass_name.constant?
           method_name = :run
-          klass_name = pieces.first.camelize
+          klass = klass_name.constantize
         else
-          method_name = pieces.pop
-          klass_name = pieces.map(&:camelize).join("::")
+          method_name = names.pop
+          klass = "Zencoder::CLI::Command::#{names.map(&:camelize).join("::")}".constantize
         end
-        klass = "Zencoder::CLI::Command::#{klass_name}".constantize
         if klass.respond_to?(method_name)
           klass.send(method_name, args, global_options, command_options)
         else

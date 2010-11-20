@@ -4,6 +4,7 @@ require 'terminal-table/import'
 
 require 'zencoder'
 
+require 'zencoder-cli/extensions'
 require 'zencoder-cli/version'
 require 'zencoder-cli/helpers'
 require 'zencoder-cli/auth'
