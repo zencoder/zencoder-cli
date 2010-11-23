@@ -37,21 +37,20 @@ end
 command = ARGV.shift.strip
 args = ARGV
 
-
 flat_commands = Zencoder::CLI::Command.commands.values.inject({}){|memo,group| memo.merge!(group) }
 command_options = Trollop::options do
   banner <<-EOS
 #{head}
 #{
-  if flat_commands[command] && flat_commands[command][:help]
+  if flat_commands[command].is_a?(Hash) && flat_commands[command][:help]
     "\n"+flat_commands[command][:help]+"\n"
   end
 }
 == Usage
 
-zencoder [global-options] #{command}#{" [args]" if flat_commands[command] && flat_commands[command][:arguments]} [options]
+zencoder [global-options] #{command}#{" [args]" if flat_commands[command].is_a?(Hash) && flat_commands[command][:arguments]} [options]
 #{
-  if flat_commands[command] && flat_commands[command][:arguments]
+  if flat_commands[command].is_a?(Hash) && flat_commands[command][:arguments]
     "\n== Arguments\n\n"+
     (1..flat_commands[command][:arguments].size).to_a.map{|i|
       "#{i}: #{flat_commands[command][:arguments][i-1].to_s}"
@@ -61,7 +60,7 @@ zencoder [global-options] #{command}#{" [args]" if flat_commands[command] && fla
 
 == Command Options
 EOS
-  if flat_commands[command] && flat_commands[command][:options]
+  if flat_commands[command].is_a?(Hash) && flat_commands[command][:options]
     flat_commands[command][:options].call(self)
   end
 end
