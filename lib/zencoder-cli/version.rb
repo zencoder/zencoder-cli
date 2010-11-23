@@ -1,5 +1,5 @@
 module Zencoder
   module CLI
-    GEM_VERSION = '0.1.6'
+    GEM_VERSION = '0.1.7'
   end
 end
