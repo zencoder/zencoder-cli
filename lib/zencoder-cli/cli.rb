@@ -17,7 +17,7 @@ zencoder [global-options] command [command-options]
 
 #{
   Zencoder::CLI::Command.commands.sort.map{|group, commands|
-    commands.map{|command, description|
+    commands.sort.map{|command, description|
       command.ljust(22)+" # "+(description.is_a?(String) ? description : description[:description])
     }.join("\n")
   }.join("\n\n")
