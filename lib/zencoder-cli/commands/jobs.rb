@@ -56,7 +56,7 @@ module Zencoder::CLI::Command
     class << self
 
       def run(args, global_options, command_options)
-        job_id = extract_job_id(args)
+        job_id = extract_id(args)
         job = Zencoder::Job.details(job_id, :base_url => Zencoder.base_url(global_options[:environment])).process_for_cli.body["job"]
         rows = []
         rows << ["ID", job["id"]]
@@ -128,47 +128,28 @@ module Zencoder::CLI::Command
       end
 
       def open(args, global_options, command_options)
-        job_id = extract_job_id(args)
+        job_id = extract_id(args)
         `open https://app.zencoder.com/jobs/#{job_id}`
       end
 
       def resubmit(args, global_options, command_options)
-        job_id = extract_job_id(args)
+        job_id = extract_id(args)
         response = Zencoder::Job.resubmit(job_id, :base_url => Zencoder.base_url(global_options[:environment])).process_for_cli
         puts "Job ##{job_id} resubmitted."
       end
 
       def cancel(args, global_options, command_options)
-        job_id = extract_job_id(args)
+        job_id = extract_id(args)
         response = Zencoder::Job.cancel(job_id, :base_url => Zencoder.base_url(global_options[:environment])).process_for_cli
         puts "Job ##{job_id} cancelled."
       end
 
       def delete(args, global_options, command_options)
-        job_id = extract_job_id(args)
+        job_id = extract_id(args)
         response = Zencoder::Job.delete(job_id, :base_url => Zencoder.base_url(global_options[:environment])).process_for_cli
         puts "Job ##{job_id} deleted."
       end
 
-
-    private
-
-      def extract_job_id(args)
-        job_id = args.shift
-        method_name = caller.first[/`(.*)'$/, 1]
-        if !job_id.to_s.strip[/^\d+$/]
-          print "Enter a Job ID: "
-          job_id = ask
-          if job_id.blank?
-            puts "No job ID given. Aborting."
-            exit 1
-          else
-            job_id
-          end
-        else
-          job_id
-        end
-      end
     end
 
   end
