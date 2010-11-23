@@ -7,7 +7,10 @@ module Zencoder::CLI::Command
                                    t.opt :page,   "Jobs page number. Default 1.", :type => Integer
                                    t.opt :long,   "Will not truncate filenames.", :default => false
                                    t.opt :state,  "Filter the job list by job state", :type => String
-                                 }}
+                                 }},
+                     "jobs:create" => { :description => "Create a job by passing a JSON string or filename",
+                                        :help => "Create a job by passing either a JSON string or the path to a file containing JSON.\n\nExamples:\nzencoder jobs:create '{ \"input\": \"http://example.com/movie.mp4\" }'\nzencoder jobs:create /path/to/file.json",
+                                        :arguments => ["json_string_or_path_to_file"] }
     class << self
 
       def run(args, global_options, command_options)
