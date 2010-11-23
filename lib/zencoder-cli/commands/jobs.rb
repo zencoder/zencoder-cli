@@ -157,10 +157,17 @@ module Zencoder::CLI::Command
         job_id = args.shift
         method_name = caller.first[/`(.*)'$/, 1]
         if !job_id.to_s.strip[/^\d+$/]
-          puts "You must specify the job to show. Try `zencoder job#{":"+method_name unless method_name == "run"} --help` for more information."
-          exit 1
+          print "Enter a Job ID: "
+          job_id = ask
+          if job_id.blank?
+            puts "No job ID given. Aborting."
+            exit 1
+          else
+            job_id
+          end
+        else
+          job_id
         end
-        job_id
       end
     end
 
