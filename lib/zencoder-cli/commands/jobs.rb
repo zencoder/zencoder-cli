@@ -38,6 +38,40 @@ module Zencoder::CLI::Command
         end
       end
 
+      def create(args, global_options, command_options)
+        arg = args.shift
+        if arg.blank?
+          puts "You must pass either a JSON string or the path to a file containing JSON."
+          exit 1
+        end
+        begin
+          json = JSON.parse(arg.to_s.first == "{" ? arg : File.read(arg))
+        rescue JSON::ParserError => e
+          puts "Invalid JSON: #{e.message}"
+          exit 1
+        rescue Errno::ENOENT => e
+          puts e.message
+          exit 1
+        end
+
+        response = Zencoder::Job.create(json, :base_url => Zencoder.base_url(global_options[:environment])).process_for_cli.body
+
+        rows = []
+        rows << ["ID", response["id"]]
+        rows << ["Test", response["test"]] if response["test"]
+        puts table([{ :value => "Job", :colspan => 2 }], *rows)
+        puts
+
+        response["outputs"].each_with_index do |output, i|
+          rows = []
+          rows << ["ID", output["id"]]
+          rows << ["Label", output["label"]] if output["label"]
+          rows << ["URL", output["url"]]
+          puts table([{ :value => "Output ##{i+1}", :colspan => 2 }], *rows)
+          puts
+        end
+      end
+
     end
   end
 
